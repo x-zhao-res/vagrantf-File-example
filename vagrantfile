@@ -1,9 +1,28 @@
-#第一部分，修改内存，持续更新
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu18"
-  config.vm.network "private_network", ip: "192.168.33.13"
-  config.vm.provider "virtualbox" do |v|
-     v.memory = 4096
-     v.cpus = 2
-  end
+  # 名称及box
+  config.vm.box = "xxxxx"
+  config.vm.hostname = "tx.frr"
+  config.vm.define "xxxxxxxx"
+  #设置密码登陆，非集群或二次使用则可以省去
+  #config.ssh.username = "vagrant"
+  #config.ssh.password = "vagrant"
+  #config.ssh.insert_key = false
+  #网络配置
+  config.vm.network "public_network"
+  config.vm.network "private_network", ip: "192.168.56.22", auto_config: false
+  # config.vm.network "private_network", type: "dhcp"
+  # config.vm.network "private_network", ip: "192.168.33.21"
+  # 清除默认路由------------------------------------------
+  config.vm.provision "shell",
+    run: "always",
+    inline: "route add default gw 192.168.18.1"
+  config.vm.provision "shell",
+    run: "always",
+    inline: "eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`"
+  # ------------------------------------------
+  #内存及CPU调整
+   config.vm.provider "virtualbox" do |vb|
+     vb.memory = "2048"
+     vb.cpus = 4
+   end
 end
